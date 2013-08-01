@@ -1,0 +1,27 @@
+<div class="row">
+
+<div class="col-lg-2">
+
+
+<div class="pull-left">
+<a href="/admin/author/add">Добави автор</a><br/>
+<a href="/admin/book/add">Добави книга</a>
+</div>
+
+</div>
+
+<div class="col-lg-7"></div>
+
+<div class="col-lg-3">
+	<span>[% session.REAL_NAME %]</span>
+</div>
+
+
+</div>
+<div class="row">
+<div class="col-lg-2"></div>
+<div class="col-lg-7"></div>
+<div class="col-lg-3">
+<a href="/logout">Изход</a>
+</div>
+</div>

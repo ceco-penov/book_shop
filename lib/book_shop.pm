@@ -75,6 +75,57 @@ get '/admin/book/add' => sub {
 	template 'book_add';
 };
 
+post '/admin/book/add' => sub {
+    my %params = params;
+
+    my $title = $params{'book_title'};
+    my $price = $params{'book_price'};
+    my $qty   = $params{'book_qty'};
+
+    debug Dumper(request->headers), "\n";
+
+    debug Dumper(\%params), "\n";
+
+    #my $file = request->upload('book_cover');
+    my $file  = upload('book_cover');
+
+    debug Dumper($file), "\n";
+    my $path = '/home/ceci/src/perl/staj/book_shop/public/book_covers/';
+    my $basename = $file->basename;
+    my $ext;
+    if ($basename =~ /.*\.([^.]*)$/) {
+        $ext = $1;
+    }
+    my $image_filename = sha1_hex(time . $basename . rand(1000)) . ".$ext";
+    $file->copy_to($path . $image_filename);
+
+    debug Dumper(\%params),$image_filename,"\n";
+
+    my $dbh = db_connect();
+    my $sth = $dbh->prepare('insert into BOOKS (TITLE, PRICE, QUANTITY, IMAGE_PATH) values (?,?,?,?)');
+    my $rv = $sth->execute($title, $price, $qty, $image_filename);
+    my $book_id = $dbh->sqlite_last_insert_rowid();
+
+    debug "book_id=$book_id\n";
+
+    for my $k (sort keys %params) {
+        my $sth1 = $dbh->prepare('insert into AUTHORS (NAME) values (?)');
+        my $sth2 = $dbh->prepare('insert into BOOK_AUTHORS (BOOK_ID,AUTHOR_ID) values (?,?)');
+
+        if ($k =~ /author/) {
+            my $auth_id = 
+            $rv = $sth1->execute($params{$k});
+            my $auth_id = $dbh->sqlite_last_insert_rowid();
+            $rv = $sth2->execute($book_id, $auth_id);
+
+            debug "book_id=$book_id | auth_id=$auth_id | author=$params{$k})\n";
+        }
+    }
+
+    redirect '/admin';
+};
+
+
 
 sub db_connect {
 	

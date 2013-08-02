@@ -31,4 +31,4 @@ DB_CONN_STR: "dbi:SQLite:dbname=/home/ceci/src/perl/staj/book_shop/book_shop.db"
 session: "YAML"
 session_name: book_shop_session
 
-server: 192.168.5.16
+#server: 192.168.5.16

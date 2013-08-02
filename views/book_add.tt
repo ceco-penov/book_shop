@@ -1,5 +1,7 @@
-<form>
+<form class="form-horizontal" method="POST" action="/admin/book/add" enctype="multipart/form-data" >
 <fieldset>
+<div class="col-lg-4"></div>
+<div class="col-lg-4">
 	<legend>Add Book</legend>
 	<div class="form-group">
 		<label for="inputBookTitle">Title</label>
@@ -18,6 +20,40 @@
 		  <input type="file" name="book_cover" id="exampleBookCover">
 		  <p class="help-block">Upload book cover image</p>
 	</div>
+    <div id="Authors">
+
+    <div class="form-group">
+        <label for="inputAuthor1">Author</label>
+        <input type="text" name="author1" class="form-control" id="inputAuthor1" placeholder="Enter author">
+        <a href="#" id="add_author"><span class="glyphicon glyphicon-plus-sign"></span> Добави автор </a>
+    </div>
+    </div>
+    
 	<button type="submit" class="btn btn-default">Submit</button>
+</div>
 </fieldset>
 </form>
+
+<script language="javascript">
+
+      
+$(function() {
+        var authors_div = $('#Authors');
+        var i = $('#Authors') .children('div.form-group').size() + 1;
+        
+        $('#add_author').live('click', function() {
+                
+                $('<div class="form-group"><label for="inputAuthor'+i+'">Author</label><input type="text" name="author'+i+'" class="form-control" id="inputAuthor'+i+'" placeholder="Enter author"><a href="#" id="add_author"><span class="glyphicon glyphicon-plus-sign"></span> Добави автор</a>&nbsp;|&nbsp;<a href="#" id="rem_author"> <span class="glyphicon glyphicon-remove-sign"></span> Премахни автор</a></div>').appendTo(authors_div);
+                i++;
+                return false;
+        });
+        
+        $('#rem_author').live('click', function() { 
+                if( i > 2 ) {
+                        $(this).parents('div.form-group').remove();
+                        i--;
+                }
+                return false;
+        });
+});
+</script>

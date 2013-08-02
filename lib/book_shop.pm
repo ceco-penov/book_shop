@@ -71,6 +71,11 @@ get '/admin' => sub {
 	};
 };
 
+get '/admin/book/add' => sub {
+	template 'book_add';
+};
+
+
 sub db_connect {
 	
 	my $db_connection_str = setting('DB_CONN_STR');

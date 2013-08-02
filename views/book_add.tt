@@ -1,0 +1,23 @@
+<form>
+<fieldset>
+	<legend>Add Book</legend>
+	<div class="form-group">
+		<label for="inputBookTitle">Title</label>
+		<input type="text" name="book_title" class="form-control" id="inputBookTitle" placeholder="Enter book title">
+	</div>
+	<div class="form-group">
+	    <label for="inputBookPrice">Price</label>
+		<input type="text" name="book_price" class="form-control" id="inputBookPrice" placeholder="Enter book price">
+	</div>
+	<div class="form-group">
+	    <label for="inputBookQty">Quantity</label>
+		<input type="text" name="book_qty" class="form-control" id="inputBookQty" placeholder="Enter quantity in stock">
+	</div>
+	<div class="form-group">
+	      <label for="exampleBookCover">Book cover image</label>
+		  <input type="file" name="book_cover" id="exampleBookCover">
+		  <p class="help-block">Upload book cover image</p>
+	</div>
+	<button type="submit" class="btn btn-default">Submit</button>
+</fieldset>
+</form>

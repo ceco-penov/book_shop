@@ -32,3 +32,6 @@ session: "YAML"
 session_name: book_shop_session
 
 #server: 192.168.5.16
+#port
+
+auto_reload: 1

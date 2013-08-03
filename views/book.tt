@@ -1,0 +1,11 @@
+<tr>
+<div class="media">
+<a class="pull-left" href="[% book.volumeInfo.imageLinks.thumbnail %]">
+<img src="[% book.volumeInfo.imageLinks.thumbnail %]" class="img-thumbnail">
+</a>
+<div class="media-body">
+<h4 class="media-heading">[% book.volumeInfo.title %]</h4><br/>
+[% book.volumeInfo.publisher %] &nbsp;,[% book.volumeInfo.publishedDate %]&nbsp;-&nbsp;[% book.volumeInfo.pageCount %] pages <br/>
+</div>
+</div>
+</tr>

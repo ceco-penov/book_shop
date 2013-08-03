@@ -6,6 +6,7 @@
 <div class="pull-left">
 <a href="/admin/author/add">Добави автор</a><br/>
 <a href="/admin/book/add">Добави книга</a>
+<a href="/admin/books/list"></a>
 </div>
 
 </div>

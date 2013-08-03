@@ -1,0 +1,6 @@
+<table class="table">
+[% FOREACH book IN books.items %]
+[%  PROCESS book.tt  %]
+[% END %]
+</table>
+

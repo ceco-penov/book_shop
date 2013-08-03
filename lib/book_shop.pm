@@ -7,6 +7,9 @@ use DBI;
 use Data::Dumper;
 use Digest::SHA qw(sha1_hex);
 
+use LWP::UserAgent;
+
+
 our $VERSION = '0.1';
 
 get '/' => sub {
@@ -113,7 +116,6 @@ post '/admin/book/add' => sub {
         my $sth2 = $dbh->prepare('insert into BOOK_AUTHORS (BOOK_ID,AUTHOR_ID) values (?,?)');
 
         if ($k =~ /author/) {
-            my $auth_id = 
             $rv = $sth1->execute($params{$k});
             my $auth_id = $dbh->sqlite_last_insert_rowid();
             $rv = $sth2->execute($book_id, $auth_id);
@@ -123,6 +125,56 @@ post '/admin/book/add' => sub {
     }
 
     redirect '/admin';
+};
+
+post '/search' => sub {
+	my %params = params;
+
+	my $book_search_url = 'https://www.googleapis.com/books/v1/volumes?q=';
+	#my $api_key = setting('google_api_key');
+
+	my $search_params = 0;
+
+	if ($params{'q'}) {
+		my $q =  $params{'q'};
+		$q =~ s/\s+/\+/g;
+		$book_search_url .= $q;
+		$search_params++;
+	}
+
+	if ($params{'q_author'}) {
+		my $q_author =  $params{'q_author'};
+		$q_author =~ s/\s+/\+/g;
+		my $plus = '';
+		$plus = '+' if $search_params;
+		$book_search_url .= "$plus"."inauthor:$q_author";
+		$search_params++;
+	}
+
+	if ($params{'q_title'}) {
+		my $q_title =  $params{'q_title'};
+		$q_title =~ s/\s+/\+/g;
+		my $plus = '';
+		$plus = '+' if $search_params;
+		$book_search_url .= "$plus"."intitle:$q_title";
+		$search_params++;
+	}
+
+	#$book_search_url .= "&key=$api_key" if $search_params;
+
+	debug "book_search_url=$book_search_url\n";
+
+	my $ua = LWP::UserAgent->new;
+	my $resp = $ua->get($book_search_url);
+	my $page = $resp->content();
+	my $info = from_json($page);
+
+	debug Dumper($info), "\n";
+
+		
+	template 'books_list' => {
+		'books' => $info,
+	};
 };
 
 

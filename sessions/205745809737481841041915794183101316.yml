@@ -1,0 +1,24 @@
+--- !!perl/hash:Dancer::Session::YAML
+cart:
+  - isbn: 9781416524809
+    price: 10
+    qty: 3
+    small_thumbnail: http://bks5.books.google.com/books?id=BjFZ0UQOUCgC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api
+    title: Deception Point
+  - isbn: 9781557048332
+    price: 10
+    qty: 1
+    small_thumbnail: http://bks3.books.google.com/books?id=EoPbJJgc71QC&printsec=frontcover&img=1&zoom=5&source=gbs_api
+    title: Angels & Demons
+  - isbn: 9781611450330
+    price: 10
+    qty: 1
+    small_thumbnail: http://bks7.books.google.com/books?id=pPXLMMySbB0C&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api
+    title: The Great Expectations School
+  - isbn: 9781409091158
+    price: 10
+    qty: 1
+    small_thumbnail: http://bks0.books.google.com/books?id=ivzfRJGrdFsC&printsec=frontcover&img=1&zoom=5&source=gbs_api
+    title: The Da Vinci Code
+id: 205745809737481841041915794183101316
+total_cart_amount: 60

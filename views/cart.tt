@@ -1,0 +1,17 @@
+<table class="table">
+<thead>
+<tr>
+<th>Book</th><th>Quantity</th><th>Price</th>
+</tr>
+</thead>
+<tbody>
+[% FOREACH book IN session.cart %]
+	<tr>
+		<td><img src="[% book.small_thumbnail %]"> [% book.title %]</td><td>[% book.qty %]</td><td>[% book.price %]</td>
+	</tr>
+[% END %]
+</tbody>
+<tr>
+<td colspan=3 align="right">Total: [% session.total_cart_amount %]</td>
+</tr>
+</table>

@@ -177,6 +177,63 @@ post '/search' => sub {
 	};
 };
 
+get '/ajax/add_to_cart' => sub {
+	my $params = params;
+
+	my $isbn = $params->{'isbn'};
+
+	debug Dumper($params), "\n";
+	debug Dumper(session), "\n\n\n";
+
+	my $cart = session('cart') if session('cart');
+
+	my $total = 0.00;
+	my $books_in_cart = 0;
+	if (defined $cart) {
+
+		my $book_found = 0;
+		for my $book (@{$cart}) {	
+			if ($book->{'isbn'} eq $isbn ) {
+				$book->{'qty'}++;
+				$book_found = 1;
+			} 
+			$total += sprintf("%.2f", $book->{'qty'} * $book->{'price'});
+			$books_in_cart++;
+		}
+
+		unless ($book_found) {
+			push @{$cart}, { isbn => $isbn, 'qty' => 1, price => 10.00, title => $params->{title}, small_thumbnail => $params->{'small_thumbnail'} };
+		}
+	}else {
+		$cart = [
+			{ isbn => $isbn, 'qty' => 1, price => 10.00, title => $params->{title}, small_thumbnail => $params->{'small_thumbnail'} },
+		];
+		$total = 10.00;
+		$books_in_cart++;
+	}
+
+	debug Dumper(session), "\n\n\n";
+
+	session 'cart' => $cart;
+	session 'total_cart_amount' => $total;
+
+
+	my $json    = new JSON;
+	my $ret = {
+			err_msg => 'Успешно добавихте продукт към вашата количка',
+			books_in_cart =>  $books_in_cart,
+	};
+	content_type 'application/json';
+	return $json->encode( $ret );
+};
+
+get '/cart' => sub {
+
+	
+
+	template 'cart';
+};
+
 
 
 sub db_connect {

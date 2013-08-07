@@ -1,11 +1,37 @@
+[% IF book.volumeInfo.imageLinks.thumbnail %]
+
 <tr>
 <div class="media">
-<a class="pull-left" href="[% book.volumeInfo.imageLinks.thumbnail %]">
+[% IF book.accessInfo.accessViewStatus != 'NONE' %]
+	[% LINK_PATH = book.accessInfo.webReaderLink %]
+[% ELSE %]
+	[% LINK_PATH = book.volumeInfo.imageLinks.thumbnail %]
+[% END %]
+
+<a class="pull-left" href="[% LINK_PATH %]">
 <img src="[% book.volumeInfo.imageLinks.thumbnail %]" class="img-thumbnail">
 </a>
 <div class="media-body">
 <h4 class="media-heading">[% book.volumeInfo.title %]</h4><br/>
-[% book.volumeInfo.publisher %] &nbsp;,[% book.volumeInfo.publishedDate %]&nbsp;-&nbsp;[% book.volumeInfo.pageCount %] pages <br/>
+
+
+[% FOREACH author IN book.volumeInfo.authors %]	
+	<a href="/author/show?name=[% author %]">[% author %]</a>&nbsp;
+[% END %]
+<br/>
+
+<em>[% book.volumeInfo.publisher %] &nbsp;,[% book.volumeInfo.publishedDate %]&nbsp;-&nbsp;[% book.volumeInfo.pageCount %] pages </em><br/><br/>
+<div>
+	[% book.volumeInfo.description %]	
 </div>
+<br/>
+[% FOREACH id IN book.volumeInfo.industryIdentifiers %]
+[% IF id.type == 'ISBN_13' %]
+[% ISBN_13 = id.identifier %]
+[% END %]
+[% END %]
+<a href="#" onclick="return add_to_cart('[% ISBN_13 %]','[% book.volumeInfo.title %]', '[% book.volumeInfo.imageLinks.smallThumbnail %]');" class="btn btn-primary">Add to cart</a>
 </div>
 </tr>
+
+[% END %]

@@ -8,7 +8,7 @@ use JSON;
 
 use Data::Dumper;
 
-my $web_page = 'https://www.googleapis.com/books/v1/volumes?q=brazilian%20juijitsu+inauthor:marcelo%20garcia&key=AIzaSyDrIo9B5cw8eJicCwMfExHxpDaK_agAlhs'; 
+my $web_page = 'https://www.googleapis.com/books/v1/volumes?q=brazilian%20juijitsu+inauthor:marcelo%20garcia'; 
 
 my $ua = LWP::UserAgent->new;
 
@@ -18,7 +18,7 @@ my $page = $resp->content();
 
 print "$page\n";
 
-my $info = from_json($page); 
+my $info = from_json($page);
 
 
 my $total_items = $info->{'totalItems'};

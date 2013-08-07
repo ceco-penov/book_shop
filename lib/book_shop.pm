@@ -9,6 +9,8 @@ use Digest::SHA qw(sha1_hex);
 
 use LWP::UserAgent;
 
+use JSON;
+
 
 our $VERSION = '0.1';
 
@@ -20,7 +22,36 @@ get '/' => sub {
 		return redirect '/admin';
 	}
 
-    template 'index';
+    my $dbh = db_connect();
+
+    # {FetchHashKeyName => 'NAME_lc'}
+
+    my @books;
+    my $sth = $dbh->prepare("select * from BOOKS order by TITLE limit 10");
+    my $rv = $sth->execute();
+    while(my $hr = $sth->fetchrow_hashref) {
+        my @authors;
+        my $book_id = $hr->{'ID'};
+        my $sth2 = $dbh->prepare("select T2.ID as ID, T2.NAME as NAME from BOOK_AUTHORS as T1, AUTHORS as T2 where T1.BOOK_ID = ? and T2.ID = T1.AUTHOR_ID ");
+        $sth2->execute($book_id);
+
+        while(my $hr2 = $sth2->fetchrow_hashref) {
+            push @authors, {ID => $hr2->{ID}, NAME => $hr2->{NAME}};
+        }
+
+        $hr->{AUTHORS} = \@authors;
+
+        debug Dumper($hr);
+
+        push @books, $hr;
+        
+    }
+
+
+
+    template 'index' => {
+        books => \@books,
+    };
 };
 
 get '/login' => sub {
@@ -180,20 +211,25 @@ post '/search' => sub {
 get '/ajax/add_to_cart' => sub {
 	my $params = params;
 
-	my $isbn = $params->{'isbn'};
+	my $book_id = $params->{'book_id'};
 
 	debug Dumper($params), "\n";
 	debug Dumper(session), "\n\n\n";
 
 	my $cart = session('cart') if session('cart');
 
+    my $dbh = db_connect();
+    my $sth = $dbh->prepare('select PRICE, SMALl_THUMBNAIL, TITLE from BOOKS where ID = ?');
+    $sth->execute($book_id);
+    my $book_hr = $sth->fetchrow_hashref;
+
 	my $total = 0.00;
 	my $books_in_cart = 0;
 	if (defined $cart) {
 
 		my $book_found = 0;
-		for my $book (@{$cart}) {	
-			if ($book->{'isbn'} eq $isbn ) {
+		for my $book (@{$cart}) {
+			if ($book->{'book_id'} == $book_id ) {
 				$book->{'qty'}++;
 				$book_found = 1;
 			} 
@@ -202,13 +238,14 @@ get '/ajax/add_to_cart' => sub {
 		}
 
 		unless ($book_found) {
-			push @{$cart}, { isbn => $isbn, 'qty' => 1, price => 10.00, title => $params->{title}, small_thumbnail => $params->{'small_thumbnail'} };
+            push @{$cart}, { book_id => $book_id, 'qty' => 1, price => $book_hr->{'PRICE'}, title => $book_hr->{'TITLE'}, small_thumbnail => $book_hr->{'SMALL_THUMBNAIL'} };
+            $books_in_cart++;
 		}
 	}else {
 		$cart = [
-			{ isbn => $isbn, 'qty' => 1, price => 10.00, title => $params->{title}, small_thumbnail => $params->{'small_thumbnail'} },
+			{ book_id => $book_id, 'qty' => 1, price => $book_hr->{'PRICE'}, title => $book_hr->{'TITLE'}, small_thumbnail => $book_hr->{'SMALL_THUMBNAIL'} },
 		];
-		$total = 10.00;
+		$total = sprintf("%.2f",  $book_hr->{'PRICE'});
 		$books_in_cart++;
 	}
 
@@ -216,9 +253,10 @@ get '/ajax/add_to_cart' => sub {
 
 	session 'cart' => $cart;
 	session 'total_cart_amount' => $total;
+    session 'cart_items_count'  => $books_in_cart;
 
 
-	my $json    = new JSON;
+	my $json    = JSON->new;
 	my $ret = {
 			err_msg => 'Успешно добавихте продукт към вашата количка',
 			books_in_cart =>  $books_in_cart,
@@ -229,7 +267,6 @@ get '/ajax/add_to_cart' => sub {
 
 get '/cart' => sub {
 
-	
 
 	template 'cart';
 };
@@ -239,7 +276,7 @@ get '/cart' => sub {
 sub db_connect {
 	
 	my $db_connection_str = setting('DB_CONN_STR');
-	my $dbh = DBI->connect($db_connection_str) or die "error: [$DBI::errstr] [$!]";
+	my $dbh = DBI->connect($db_connection_str,,,{FetchHashKeyName => 'NAME_lc'}) or die "error: [$DBI::errstr] [$!]";
 
 	return $dbh;
 }

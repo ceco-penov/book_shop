@@ -1,4 +1,4 @@
-[% IF book.volumeInfo.imageLinks.thumbnail %]
+[% IF book.thumbnail %]
 
 <tr>
 <div class="media">

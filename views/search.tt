@@ -1,0 +1,28 @@
+<div class="row">
+<div class="col-lg-10">
+	<form method="POST" action="/search">
+		<fieldset>
+		<div class="col-lg-4">
+		<legend>Search</legend>
+		<div class="form-group">
+			<label for="inputSearch" control-label">Търсене</label>
+			<input type="text" name="q" class="form-control" id="inputSearch" placeholder="Търсене">
+		</div>
+		<div class="form-group">
+			<label for="inputAuthor" control-label">Търсене по автор</label>
+			<input type="text" name="q_author" class="form-control" id="inputAuthor" placeholder="Автор">
+		</div>
+		<div class="form-group">
+			<label for="inputTitle" control-label">Търсене по заглавие</label>
+			<input type="text" name="q_title" class="form-control" id="inputTitle" placeholder="думи в заглавие">
+		</div>
+
+		<button type="submit" class="btn btn-default">Търси</button>
+		</div>
+		</fieldset>
+	</form>
+</div>
+<div class="col-lg-2">
+	<a href="/login">Вход</a>
+</div>
+</div>

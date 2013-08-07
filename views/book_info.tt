@@ -1,0 +1,26 @@
+[% IF book.THUMBNAIL %]
+<tr>
+<div class="media">
+<a class="pull-left" href="[% book.WEB_READER_LINK %]">
+<img src="[% book.THUMBNAIL %]" class="img-thumbnail">
+</a>
+<div class="media-body">
+<h4 class="media-heading">[% book.TITLE %]</h4><br/>
+
+
+[% FOREACH author IN book.AUTHORS %]	
+	<a href="/author/show?id=[% author.ID %]">[% author.NAME %]</a>&nbsp;
+[% END %]
+<br/>
+
+<em>[% book.PUBLISHER %] &nbsp;,[% book.PUBLISH_DATE %]&nbsp;-&nbsp;[% book.PAGES %] pages </em><br/><br/>
+Price: <strong>[% book.PRICE %] $</strong><br/>
+<div>
+	[% book.DESCRIPTION %]	
+</div>
+<br/>
+<a href="#" onclick="return add_to_cart([% book.ID %]);" class="btn btn-primary">Add to cart</a>
+</div>
+</tr>
+
+[% END %]

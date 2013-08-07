@@ -1,6 +1,6 @@
 <div id="ajax_response"></div>
 <div class="navbar">
-	<a href="/cart" id="cart">Cart</a>
+	<a href="/cart" id="cart">Cart <span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge" id="cart_badge">[% session.cart_items_count %]</span></a>
 </div>
 
 <table class="table">
@@ -17,7 +17,7 @@ function add_to_cart(isbn, title, small_thumbnail) {
 		data: {isbn: isbn, title: title, small_thumbnail: small_thumbnail},
 		dataType: 'json',
   		success: function( msg ) {
-  			$('#cart').html('Cart <span class="badge" id="cart_badge">'+ msg.books_in_cart +'</span>');
+  			$('#cart').html('Cart <span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge" id="cart_badge">'+ msg.books_in_cart +'</span>');
 			$('#ajax_response').html('<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">×</button> '+ msg.err_msg +'</div>');
   		}
 	});

@@ -10,10 +10,4 @@
     </div>
 </div>
 
-<table class="table">
-[% FOREACH book IN books %]
-[%  PROCESS book_info.tt  %]
-[% END %]
-</table>
-
 

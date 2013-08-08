@@ -1,17 +1,43 @@
-<table class="table">
+<table class="table" id="cart_data">
 <thead>
 <tr>
-<th>Book</th><th>Quantity</th><th>Price</th>
+<th>Book</th><th>Quantity</th><th>Price</th><th>Total Price</th><th></th>
 </tr>
 </thead>
 <tbody>
 [% FOREACH book IN session.cart %]
-	<tr>
-		<td><img src="[% book.small_thumbnail %]"> [% book.title %]</td><td>[% book.qty %]</td><td>[% book.price %]</td>
+	<tr id="[% book.book_id %]">
+		<td><a href="/book/show/[% book.book_id %]"> <img src="[% book.small_thumbnail %]"> [% book.title %]</a></td>
+		
+		<td id="td_books_qty_[% book.book_id %]">
+		<select id="books_qty_[% book.book_id %]">
+		[% OPTS = 0 %]
+		[% SELECTED = book.qty %]
+
+		[% WHILE OPTS < 20 %]
+		[% OPTS = OPTS + 1%]
+		<option [% IF OPTS == SELECTED %]selected="selected"[% END %]>[% OPTS %]</option>
+		[% END %]
+		</select>
+		</td>
+		
+		
+		<td id="price_[% book.book_id %]">[% book.price %]</td>
+		<td id="total_[% book.book_id %]">[% book.qty * book.price%]</td>
+		<td><a href="/cart/delete/[% book.book_id %]"><span class="glyphicon glyphicon-remove"></span></a></td>
 	</tr>
 [% END %]
 </tbody>
 <tr>
-<td colspan=3 align="right">Total: [% session.total_cart_amount %]</td>
+<td colspan=3 align="right"><strong>Total</strong>:</td>
+<td id="grand_total">[% session.total_cart_amount %] $</td>
+<td></td>
+</tr>
+
+
+<tr>
+<td colspan=3 align="right"><a href="#" onclick="return update_cart();" class="btn btn-primary">Обновете количката</a></td>
+<td></td>
+<td></td>
 </tr>
 </table>

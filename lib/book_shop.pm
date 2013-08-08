@@ -24,8 +24,6 @@ get '/' => sub {
 
     my $dbh = db_connect();
 
-    # {FetchHashKeyName => 'NAME_lc'}
-
     my @books;
     my $sth = $dbh->prepare("select * from BOOKS order by TITLE limit 10");
     my $rv = $sth->execute();
@@ -211,15 +209,23 @@ post '/search' => sub {
 get '/ajax/add_to_cart' => sub {
 	my $params = params;
 
-	my $book_id = $params->{'book_id'};
+	my $book_id  = $params->{'book_id'};
+	my $book_qty = $params->{'book_qty'} || 1;
 
 	debug Dumper($params), "\n";
+
+	if ($book_id !~ /\d+/ or $book_qty !~ /\d+/ or ($book_qty < 1 or $book_qty > 5)) {
+		status 'not_found';
+		content_type 'application/json';
+		return '{}';
+	}
+
 	debug Dumper(session), "\n\n\n";
 
 	my $cart = session('cart') if session('cart');
 
     my $dbh = db_connect();
-    my $sth = $dbh->prepare('select PRICE, SMALl_THUMBNAIL, TITLE from BOOKS where ID = ?');
+    my $sth = $dbh->prepare('select PRICE, SMALL_THUMBNAIL, TITLE from BOOKS where ID = ?');
     $sth->execute($book_id);
     my $book_hr = $sth->fetchrow_hashref;
 
@@ -230,7 +236,7 @@ get '/ajax/add_to_cart' => sub {
 		my $book_found = 0;
 		for my $book (@{$cart}) {
 			if ($book->{'book_id'} == $book_id ) {
-				$book->{'qty'}++;
+				$book->{'qty'} += $book_qty;
 				$book_found = 1;
 			} 
 			$total += sprintf("%.2f", $book->{'qty'} * $book->{'price'});
@@ -238,14 +244,15 @@ get '/ajax/add_to_cart' => sub {
 		}
 
 		unless ($book_found) {
-            push @{$cart}, { book_id => $book_id, 'qty' => 1, price => $book_hr->{'PRICE'}, title => $book_hr->{'TITLE'}, small_thumbnail => $book_hr->{'SMALL_THUMBNAIL'} };
+            push @{$cart}, { book_id => $book_id, 'qty' => $book_qty, price => $book_hr->{'PRICE'}, title => $book_hr->{'TITLE'}, small_thumbnail => $book_hr->{'SMALL_THUMBNAIL'} };
             $books_in_cart++;
+			$total += $book_hr->{'PRICE'} * $book_qty;
 		}
 	}else {
 		$cart = [
-			{ book_id => $book_id, 'qty' => 1, price => $book_hr->{'PRICE'}, title => $book_hr->{'TITLE'}, small_thumbnail => $book_hr->{'SMALL_THUMBNAIL'} },
+			{ book_id => $book_id, 'qty' => $book_qty, price => $book_hr->{'PRICE'}, title => $book_hr->{'TITLE'}, small_thumbnail => $book_hr->{'SMALL_THUMBNAIL'} },
 		];
-		$total = sprintf("%.2f",  $book_hr->{'PRICE'});
+		$total = sprintf("%.2f",  $book_hr->{'PRICE'} * $book_qty);
 		$books_in_cart++;
 	}
 
@@ -271,12 +278,100 @@ get '/cart' => sub {
 	template 'cart';
 };
 
+get '/book/show/:id' => sub {
+
+	my $book_id = params->{'id'};
+
+	my $dbh = db_connect();
+
+	my @books;
+	my $sth = $dbh->prepare("select * from BOOKS where ID = ?");
+	my $rv = $sth->execute($book_id);
+	my $hr = $sth->fetchrow_hashref();
+	my @authors;
+	
+	$sth = $dbh->prepare("select T2.ID as ID, T2.NAME as NAME from BOOK_AUTHORS as T1, AUTHORS as T2 where T1.BOOK_ID = ? and T2.ID = T1.AUTHOR_ID ");
+	$sth->execute($book_id);
+
+	while(my $hr2 = $sth->fetchrow_hashref) {
+		push @authors, {ID => $hr2->{ID}, NAME => $hr2->{NAME}};
+	}
+
+	$hr->{AUTHORS} = \@authors;
+
+	debug Dumper($hr);
+
+	template 'book_show' => {
+		book => $hr,	
+	};
+};
+
+get '/ajax/update_cart' => sub {
+	my $params = params;
+
+	debug Dumper($params);
+
+	my $json_cart = $params->{'cart'};
+	my $json    = JSON->new;
+	my $cart = $json->decode( $json_cart );
+
+	my $sess_cart = session('cart') if session('cart');
+
+	my $grand_total = 0.00;
+	for my $item (@{$sess_cart}) {
+
+		my $book_id = $item->{'book_id'};
+		for my $up_item (@{$cart}) {
+			if ($book_id eq $up_item->{book_id}) {
+				$item->{'qty'} = $up_item->{'qty'};
+				$grand_total   += $item->{'qty'} * $item->{'price'};
+			}
+		}
+	}
+
+	session 'cart' => $sess_cart;
+	session 'total_cart_amount' => $grand_total;
+
+	debug Dumper(session),"\n\n\n";
+
+	content_type 'application/json';
+	return '{}';
+};
+
+get '/cart/delete/:book_id' => sub {
+	my $book_id = params->{'book_id'};
+
+	my $sess_cart = session('cart');
+	my $total_cart_amount = session('total_cart_amount');
+
+	my @cart = @$sess_cart;
+	my $idx_to_del = -1;
+
+	my $amount_minus = 0.00; 
+
+	for my $i (0..$#cart) {
+		if ($cart[$i]{'book_id'} eq $book_id) {
+			$idx_to_del = $i;
+			$amount_minus = $cart[$i]{'qty'} * $cart[$i]{'price'};
+			last;
+		}
+	}
+
+	splice(@cart,$idx_to_del,1);
+	
+	session 'cart' => \@cart;
+	session 'total_cart_amount' => $total_cart_amount - $amount_minus;
+	session 'cart_items_count' => scalar @cart;
+
+	redirect '/cart';
+};
+
 
 
 sub db_connect {
 	
 	my $db_connection_str = setting('DB_CONN_STR');
-	my $dbh = DBI->connect($db_connection_str,,,{FetchHashKeyName => 'NAME_lc'}) or die "error: [$DBI::errstr] [$!]";
+	my $dbh = DBI->connect($db_connection_str,,,{FetchHashKeyName => 'NAME_uc'}) or die "error: [$DBI::errstr] [$!]";
 
 	return $dbh;
 }

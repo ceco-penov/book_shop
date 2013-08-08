@@ -1,0 +1,5 @@
+--- !!perl/hash:Dancer::Session::YAML
+cart: []
+cart_items_count: 0
+id: 80015613816344213405034822685460625
+total_cart_amount: 0

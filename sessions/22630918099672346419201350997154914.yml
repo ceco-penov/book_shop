@@ -1,0 +1,20 @@
+--- !!perl/hash:Dancer::Session::YAML
+cart:
+  - book_id: 45
+    price: 20
+    qty: 2
+    small_thumbnail: http://bks3.books.google.com/books?id=n-k6-ij0O8UC&printsec=frontcover&img=1&zoom=5&source=gbs_api
+    title: A Time to Kill
+  - book_id: 6
+    price: 22
+    qty: 1
+    small_thumbnail: http://bks2.books.google.com/books?id=amDTAdDGW74C&printsec=frontcover&img=1&zoom=5&source=gbs_api
+    title: Anathem
+  - book_id: 15
+    price: 16
+    qty: 1
+    small_thumbnail: http://bks3.books.google.com/books?id=EoPbJJgc71QC&printsec=frontcover&img=1&zoom=5&source=gbs_api
+    title: Angels & Demons
+cart_items_count: 3
+id: 22630918099672346419201350997154914
+total_cart_amount: 78

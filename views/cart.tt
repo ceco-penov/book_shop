@@ -36,8 +36,42 @@
 
 
 <tr>
-<td colspan=3 align="right"><a href="#" onclick="return update_cart();" class="btn btn-primary">Обновете количката</a></td>
-<td></td>
+<td align="left"><a href="/" class="btn btn-primary">Връщане към магазина</a></td>
+<td colspan=2 align="right"><a href="#" onclick="return update_cart();" class="btn btn-primary">Обновете количката</a></td>
+<td><a href="#checkout_modal" data-toggle="modal" class="btn btn-primary btn-lg">Поръчване</a></td>
 <td></td>
 </tr>
 </table>
+
+<!-- Modal -->
+  <div class="modal fade" id="checkout_modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Данни за доставка</h4>
+        </div>
+        <div class="modal-body">
+        	<form method="POST" action="/checkout">
+				
+				<div class="form-group">
+        			<label for="inputNames">Име и фамилия</label>
+        			<input type="text" name="buyer_names" class="form-control" id="inputNames" placeholder="Име и фамилия">
+    			</div>
+				<div class="form-group">
+                    <label for="inputPhone">Телефон за контакт</label>
+                    <input type="text" name="buyer_phone" class="form-control" id="inputPhone" placeholder="Телефон за контакт">
+                </div>
+				<div class="form-group">
+                    <label for="inputAddress">Адрес</label>
+                    <input type="text" name="buyer_address" class="form-control" id="inputAddress" placeholder="Адрес - град,улица,номер | ж.к.,блок,вход,ап. ">
+                </div>	
+				<button type="submit" class="btn btn-primary">Завърши поръчката</button>
+			</form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->

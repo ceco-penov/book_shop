@@ -1,11 +1,13 @@
 <div id="ajax_response"></div>
+<div id="messages"><div class="alert alert-success" [% IF success_message %] [% ELSE %] style="display: none" [% END %]><button type="button" class="close" data-dismiss="alert">×</button>[% success_message %]</div></div>
 <div class="navbar">
     <div class="row">
         <div class="col-lg-8">
         </div>
         <div class="col-lg-4">
 	        <a href="/cart" id="cart">Cart <span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge" id="cart_badge">[% session.cart_items_count %]</span></a> |
-            <a href="/login">Вход</a>            
+			<a href="/orders">Всички поръчки</a> |
+            <a href="/login">Вход</a> 
         </div>
     </div>
 </div>

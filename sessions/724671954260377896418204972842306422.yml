@@ -1,0 +1,24 @@
+--- !!perl/hash:Dancer::Session::YAML
+cart:
+  - book_id: 15
+    price: 16
+    qty: 1
+    small_thumbnail: http://bks3.books.google.com/books?id=EoPbJJgc71QC&printsec=frontcover&img=1&zoom=5&source=gbs_api
+    title: Angels & Demons
+  - book_id: 23
+    price: 23
+    qty: 1
+    small_thumbnail: http://bks2.books.google.com/books?id=GXznEnKwTdAC&printsec=frontcover&img=1&zoom=5&source=gbs_api
+    title: 'Angels & Demons - Movie Tie-In'
+  - book_id: 25
+    price: 21
+    qty: 4
+    small_thumbnail: http://bks9.books.google.com/books?id=kDZSh9rtva4C&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api
+    title: Bag Of Bones
+cart_items_count: 3
+id: 724671954260377896418204972842306422
+order_finished: 0
+order_ids:
+  - 2
+  - 3
+total_cart_amount: 123

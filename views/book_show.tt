@@ -3,7 +3,7 @@
 [% IF book.THUMBNAIL %]
 <tr>
 <div class="media">
-<a class="pull-left" href="/book/show/[% book.WEB_READER_LINK %]">
+<a class="pull-left" href="[% book.WEB_READER_LINK %]">
 <img src="[% book.THUMBNAIL %]" class="img-thumbnail">
 </a>
 <div class="media-body">

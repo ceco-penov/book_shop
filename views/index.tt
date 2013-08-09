@@ -1,14 +1,4 @@
-<div id="ajax_response"></div>
-<div class="navbar">
-    <div class="row">
-        <div class="col-lg-8">
-        </div>
-        <div class="col-lg-4">
-	        <a href="/cart" id="cart">Cart <span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge" id="cart_badge">[% session.cart_items_count %]</span></a> |
-            <a href="/login">Вход</a>            
-        </div>
-    </div>
-</div>
+[% INCLUDE navbar.tt %]
 
 <table class="table">
 [% FOREACH book IN books %]

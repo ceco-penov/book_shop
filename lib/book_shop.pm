@@ -11,6 +11,8 @@ use LWP::UserAgent;
 
 use JSON;
 
+use utf8;
+
 
 our $VERSION = '0.1';
 
@@ -39,17 +41,22 @@ get '/' => sub {
 
         $hr->{AUTHORS} = \@authors;
 
-        debug Dumper($hr);
+        #debug Dumper($hr);
 
         push @books, $hr;
         
     }
 
+	my $templ_params = {};
+	if (session('order_finished')) {
+		
+		$templ_params->{'success_message'} = 'Вашата поръчка е приета успешно!';
+		session 'order_finished' => 0;
+	}
 
+	$templ_params->{books} = \@books;
 
-    template 'index' => {
-        books => \@books,
-    };
+    template 'index' => $templ_params;
 };
 
 get '/login' => sub {
@@ -366,12 +373,85 @@ get '/cart/delete/:book_id' => sub {
 	redirect '/cart';
 };
 
+post '/checkout' => sub {
+	my $params = params;
+
+	my $buyer_name  = $params->{'buyer_names'};
+	my $buyer_phone = $params->{'buyer_phone'};
+	my $buyer_address = $params->{'buyer_address'};
+
+	my $cart = session('cart');
+	my $total_price = session('total_cart_amount');
+
+	my $dbh = db_connect();
+	my $sth = $dbh->prepare("insert into ORDERS (DATE_TIME, TOTAL_PRICE, ANON_USER_REAL_NAME, ANON_USER_PHONE, ANON_USER_ADDRESS) values (?,?,?,?,?)");
+	$sth->execute(time, $total_price, $buyer_name, $buyer_phone, $buyer_address);
+	my $order_id = $dbh->sqlite_last_insert_rowid();
+
+	for my $book (@$cart) {
+		my $sth = $dbh->prepare("insert into ORDERED_BOOKS (ORDER_ID, BOOK_ID, QUANTITY, PRICE, TOTAL_PRICE) values (?,?,?,?,?)");
+
+		$sth->execute($order_id, $book->{book_id}, $book->{qty}, $book->{price}, $book->{qty} * $book->{price});
+	}
+
+	my $order_ids = session('order_ids') || [];
+	push @$order_ids, $order_id;
+
+	session 'order_finished' => 1;
+	session 'order_ids' => $order_ids;
+	session 'cart' => [];
+
+	debug Dumper(session);
+
+	return redirect '/';
+	
+};
+
+get '/orders' => sub {
+
+	my $orders = session('order_ids') || [];
+
+	my $dbh = db_connect();
+
+	my @orders;
+	for my $order (@$orders) {
+		my $sth = $dbh->prepare('select * from ORDERS where ID = ?');
+		$sth->execute($order);
+		my $hr = $sth->fetchrow_hashref();
+
+		debug "@@@@@@@@@@@@@@ NAME=".$hr->{'ANON_USER_REAL_NAME'},"\n";
+
+		$hr->{'DATE_TIME_FMT'} = scalar localtime ($hr->{'DATE_TIME'});
+
+		my @books;
+		$sth = $dbh->prepare('select * from ORDERED_BOOKS where ORDER_ID = ?');
+		$sth->execute($order);
+		while(my $book_hr = $sth->fetchrow_hashref()) {
+
+			my $sth2 = $dbh->prepare("select * from BOOKS where ID = ?");
+			$sth2->execute($book_hr->{'BOOK_ID'});
+			my $book_info_hr = $sth2->fetchrow_hashref();
+
+			$book_hr->{'INFO'} = $book_info_hr;
+			push @books, $book_hr;
+		}
+
+		$hr->{'BOOKS'} = \@books;
+
+		push @orders, $hr;
+	}
+
+	template 'orders' => {
+		orders => \@orders,
+	};
+	
+};
 
 
 sub db_connect {
 	
 	my $db_connection_str = setting('DB_CONN_STR');
-	my $dbh = DBI->connect($db_connection_str,,,{FetchHashKeyName => 'NAME_uc'}) or die "error: [$DBI::errstr] [$!]";
+	my $dbh = DBI->connect($db_connection_str,'','', {FetchHashKeyName => 'NAME_uc', sqlite_unicode => 1,}) or die "error: [$DBI::errstr] [$!]";
 
 	return $dbh;
 }

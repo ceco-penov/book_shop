@@ -1,0 +1,48 @@
+
+<br/><a href="/" class="btn btn-primary">Връщане към магазина</a><br/><br/>
+
+[% ALL_ORDERS = 0%]
+[% FOREACH order IN orders %]
+<div>
+[% ALL_ORDERS = ALL_ORDERS + 1%]
+<pre>
+<strong>Дата и час на поръчката: [% order.DATE_TIME_FMT %]</strong>
+Лични данни:
+Име: [% order.ANON_USER_REAL_NAME %] 
+Телефон за връзка: [% order.ANON_USER_PHONE %]
+Адрес за доставка: [% order.ANON_USER_ADDRESS %]
+
+</pre>
+<table class="table">
+<thead>
+<tr>
+<th>Книга</th>
+<th>Количество</th>
+<th>Ед. цена</th>
+<th>Цена</th>
+</tr>
+</thead>
+<tbody>
+[% FOREACH book IN order.BOOKS %]
+<tr>
+<td><a href="/book/show/[% book.BOOK_ID %]"><img src="[% book.INFO.SMALL_THUMBNAIL%]">[% book.INFO.TITLE %]</td>
+<td>[% book.QUANTITY %]</td>
+<td>[% book.PRICE %]</td>
+<td>[% book.TOTAL_PRICE %]</td>
+</tr>
+[% END %]
+<tr>
+<td colspan=3></td>
+<td>[% order.TOTAL_PRICE %]$</td>
+</tr>
+</tbody>
+</table>
+</div>
+[% END %]
+
+
+[% IF ALL_ORDERS < 1 %]
+
+Нямате направени поръчки !
+
+[% END %]
